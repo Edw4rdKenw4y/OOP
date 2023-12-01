@@ -11,9 +11,9 @@ public class Main {
 
 	public static void main(String[] args) {
 
-		// GeneralFunction.createDataDir();
-
-		switch (Menu.menuAdmin(userInput)) {
+		while(true)
+		{
+			switch (Menu.menuAdmin(userInput)) {
 		case "1":
 			Menu.displayUserList();
 			AdminFunction.DisplayUser();
@@ -25,10 +25,13 @@ public class Main {
 		case "3":
 			Menu.editUser();
 			AdminFunction.editUser(userInput);
+		case "4":
+			Menu.deleteUser();
+			AdminFunction.deleteUser(userInput);
 		default:
 			break;
 		}
-
+		}
 	}
 
 }
