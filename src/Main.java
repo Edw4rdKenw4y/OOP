@@ -20,7 +20,7 @@ public class Main {
 			break;
 		case "2":
 			Menu.addUser();
-			AdminFunction.addUser(userInput);
+			GeneralFunction.signUp(userInput);
 			break;
 		case "3":
 			Menu.editUser();

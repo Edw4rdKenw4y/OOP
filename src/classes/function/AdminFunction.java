@@ -25,7 +25,8 @@ public class AdminFunction {
     }
 
     public static void editUser(Scanner userInput) {
-        AccountRepository accountRepository = new AccountRepository(Constant.dataPath.accounts_File);
+
+            AccountRepository accountRepository = new AccountRepository(Constant.dataPath.accounts_File);
         System.out.println("Enter the username of the user you want to edit:");
         System.out.print(" ");
         String username = userInput.nextLine();
@@ -47,15 +48,23 @@ public class AdminFunction {
 
             switch (choice) {
                 case 1:
-                    System.out.println("Enter new full name:");
+                do {
+                    System.out.println("Enter your full name (Ex: First_Mid_LastName)");
                     System.out.print(" ");
                     userInfoToEdit.setFullName(CheckInput.toFullName(userInput.nextLine()));
+                    if (userInfoToEdit.getFullName() == null)
+                        System.out.println("You entered the name in the wrong format");
+                } while (userInfoToEdit.getFullName() == null);
                     break;
                 case 2:
-                    System.out.println("Enter new year of birth:");
+                do {
+                    System.out.println("Enter your year of birth");
                     System.out.print(" ");
                     String year = CheckInput.toStrNumberic(userInput.nextLine(), 1950, Year.now().getValue());
                     userInfoToEdit.setYearOfBirth(year == null ? -1 : Integer.parseInt(year));
+                    if (userInfoToEdit.getYearOfBirth() == -1)
+                        System.out.println("Invalid year");
+                } while (userInfoToEdit.getYearOfBirth() == -1);
                     break;
                 case 3:
                     System.out.println("Enter new gender (Male/Female/Other):");
@@ -63,9 +72,13 @@ public class AdminFunction {
                     userInfoToEdit.setGender(CheckInput.toGender(userInput.nextLine()));
                     break;
                 case 4:
-                    System.out.println("Enter new phone number:");
+                do {
+                    System.out.println("Enter your phone number");
                     System.out.print(" ");
                     userInfoToEdit.setPhoneNumber(CheckInput.toPhoneNumber(userInput.nextLine()));
+                    if (userInfoToEdit.getPhoneNumber() == null)
+                        System.out.println("Invalid phone number in Viet Nam");
+                } while (userInfoToEdit.getPhoneNumber() == null);
                     break;
                 default:
                     System.out.println("Invalid choice. No information edited.");
@@ -79,6 +92,8 @@ public class AdminFunction {
         } else {
             System.out.println("User not found. Unable to edit.");
         }
+        
+        
     }
 
     public static void deleteUser(Scanner sc)
@@ -92,76 +107,6 @@ public class AdminFunction {
         } else {
             System.out.println("Wrong user name!!");
         }
-    }
-
-    public static void addUser(Scanner sc)
-    {
-        AccountRepository accountRepository = new AccountRepository(Constant.dataPath.accounts_File);
-		Account newAccount = null;
-		String username = null;
-		String role = null;
-		String password = null;
-		UserInfo info = new UserInfo();
-
-		do {
-			System.out.println("Please enter your student ID (professor ID)");
-			System.out.print(" ");
-			username = sc.nextLine();
-			role = CheckInput.toRole(username);
-			if (role == null)
-				System.out.println("This ID is invalid");
-		} while (role == null);
-		System.out.println("Create a password");
-		System.out.print(" ");
-		password = sc.nextLine();
-		do {
-			System.out.println("Enter your full name (Ex: First_Mid_LastName)");
-			System.out.print(" ");
-			info.setFullName(CheckInput.toFullName(sc.nextLine()));
-			if (info.getFullName() == null)
-				System.out.println("You entered the name in the wrong format");
-		} while (info.getFullName() == null);
-		do {
-			System.out.println("Enter your year of birth");
-			System.out.print(" ");
-			String year = CheckInput.toStrNumberic(sc.nextLine(), 1950, Year.now().getValue());
-			info.setYearOfBirth(year == null ? -1 : Integer.parseInt(year));
-			if (info.getYearOfBirth() == -1)
-				System.out.println("Invalid year");
-		} while (info.getYearOfBirth() == -1);
-		System.out.println("Male or Female or Other?");
-		System.out.print(" ");
-		info.setGender(CheckInput.toGender(sc.nextLine()));
-		do {
-			System.out.println("Enter your phone number");
-			System.out.print(" ");
-			info.setPhoneNumber(CheckInput.toPhoneNumber(sc.nextLine()));
-			if (info.getPhoneNumber() == null)
-				System.out.println("Invalid phone number in Viet Nam");
-		} while (info.getPhoneNumber() == null);
-
-		switch (role) {
-		case "admin":
-			newAccount = new Admin();
-			break;
-		case "professor":
-			newAccount = new Professor();
-			break;
-		case "student":
-			newAccount = new Student();
-			break;
-		default:
-			break;
-		}
-		newAccount.setUsername(username);
-		newAccount.setPassword(password);
-		newAccount.setRole(role);
-		newAccount.setInfo(info);
-
-		if (accountRepository.addUser(newAccount)) {
-			System.out.println("Registration successful!");
-		}
-		System.out.println("Registration failed. Username already exists.");
     }
 
 }
