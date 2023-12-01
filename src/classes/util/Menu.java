@@ -74,9 +74,10 @@ public class Menu {
 				    + "\t║			  Professor  		 ║\n"
 				    + "\t╚═══════════════════════════════╝\n"
 				    + "\n"
-				    + "\t[1] Display user's list      [2] Add new user\n"
-				    + "\t[3] Edit user infor 		  [4] Delete user\n"
-				    + "\t[5] Log Out\n"
+				    + "\t[1] Add question     	[2] Edit question\n"
+				    + "\t[3] Delete question  	[4] Add exam\n"
+				    + "\t[5] Edit exam         	[6] Delete exam\n"
+				    + "\t[7] Exam results\n"
 				    + "\n"
 				    + "Please choose 1 of the 5 options above or enter other content to exit\n"
 				    + " ";

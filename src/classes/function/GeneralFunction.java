@@ -22,7 +22,7 @@ public class GeneralFunction {
 		return false;
 	}
 
-	public static String signIn(Scanner userInput) {
+	public static Account signIn(Scanner userInput) {
 		AccountRepository accountRepository = new AccountRepository(Constant.dataPath.accounts_File);
 		System.out.println("Enter your student ID (professor ID)");
 		System.out.print(" ");
@@ -33,23 +33,20 @@ public class GeneralFunction {
 
 		Account loggedInAccount = accountRepository.findUserByUserName(username);
 		if (loggedInAccount != null && loggedInAccount.getPassword().equals(password)) {
-			System.out.println("Login successful!");
 			if (loggedInAccount.getRole().equalsIgnoreCase("admin")) {
 				System.out.println("Successfully logged in with Admin account");
-				return "admin";
 			} else if (loggedInAccount.getRole().equalsIgnoreCase("professor")) {
 				System.out.println("Successfully logged in with Professor account");
-				return "professor";
 			} else {
 				System.out.println("Successfully logged in with Student account");
-				return "student";
 			}
+			return loggedInAccount;
 		}
 		System.out.println("Login failed. Invalid username or password.");
 		return null;
 	}
 
-	public static String signUp(Scanner userInput) {
+	public static Account signUp(Scanner userInput) {
 
 		AccountRepository accountRepository = new AccountRepository(Constant.dataPath.accounts_File);
 		Account newAccount = null;
@@ -79,7 +76,7 @@ public class GeneralFunction {
 		do {
 			System.out.println("Enter your year of birth");
 			System.out.print(" ");
-			String year = CheckInput.toStrNumberic(userInput.nextLine(), 1950, Year.now().getValue());
+			String year = CheckInput.toStrNumberic(userInput.nextLine(), 1950, Year.now().getValue() - 6);
 			info.setYearOfBirth(year == null ? -1 : Integer.parseInt(year));
 			if (info.getYearOfBirth() == -1)
 				System.out.println("Invalid year");
@@ -115,7 +112,7 @@ public class GeneralFunction {
 
 		if (accountRepository.addUser(newAccount)) {
 			System.out.println("Registration successful!");
-			return role;
+			return newAccount;
 		}
 		System.out.println("Registration failed. Username already exists.");
 		return null;
