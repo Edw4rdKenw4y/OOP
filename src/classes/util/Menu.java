@@ -69,6 +69,19 @@ public class Menu {
 				+ "Logout successfully\n";
 		System.out.print(text);
 	}
+	public static String editUser(Scanner input) {
+		String text = "\n"
+				    + "\t[1] Full Name      [2] Year of Birth\n"
+				    + "\t[3] Gender 		[4] Phone Number\n"
+				    + "\n"
+				    + "Please choose 1 of the 4 options above or enter other content to exit\n"
+				    + " ";
+	System.out.print(text);
+	return CheckInput.toStrNumberic(input.nextLine(), 1, 4);
+	}
+	
+	
+	
 	public static String menuProfessor(Scanner input) {
 		String text = "\t╔═══════════════════════════════╗\n"
 				    + "\t║			  Professor  		 ║\n"
@@ -83,5 +96,16 @@ public class Menu {
 				    + " ";
 	System.out.print(text);
 	return CheckInput.toStrNumberic(input.nextLine(), 1, 5);
+	}
+	public static String removeQuestion(Scanner input) {
+		String text = "\tChoose delete method\n"
+					+ "\n"
+				    + "\t[1] Delete by content     [2] Delete by chapter\n"
+				    + "\t[3] Delete by difficulty\n"
+				    + "\n"
+				    + "Please choose 1 of the 3 options above or enter other content to exit\n"
+				    + " ";
+	System.out.print(text);
+	return CheckInput.toStrNumberic(input.nextLine(), 1, 3);
 	}
 }

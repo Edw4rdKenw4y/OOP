@@ -1,4 +1,5 @@
 package classes.function;
+
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.Flow.Processor;
@@ -10,23 +11,26 @@ import classes.question.QuestionSet;
 import classes.repository.ExamRepository;
 import classes.repository.QuestionRepository;
 import classes.subject.Subject;
+import classes.util.CheckInput;
 import classes.util.Constant;
 import classes.util.Date;
+import classes.util.Menu;
 
 public class ProfessorFunction {
-    
-    public static void ShowQuesBank()
-    {
-        QuestionRepository questionRepository = new QuestionRepository(Constant.dataPath.QuestionBanks_Dir);
+
+    public static void ShowQuesBank(Subject subject) {
+        QuestionRepository questionRepository = new QuestionRepository(
+                Constant.dataPath.QuestionBanks_Dir + subject.getId());
         System.out.println("Question List:");
-                for (Question ques : questionRepository.getQuesbank().getQuesList()) {
+        questionRepository.getQuesbank().setSubject(subject);
+        for (Question ques : questionRepository.getQuesbank().getQuesList()) {
             System.out.println(ques);
-            }
+        }
     }
 
-    public static void addQuestion(Scanner sc)
-    {
-        QuestionRepository questionRepository = new QuestionRepository(Constant.dataPath.QuestionBanks_Dir);
+    public static void addQuestion(Subject subject, Scanner sc) {
+        QuestionRepository questionRepository = new QuestionRepository(
+                Constant.dataPath.QuestionBanks_Dir + subject.getId());
         System.out.println("Choose chapter :");
         int chapter = sc.nextInt();
         sc.nextLine();
@@ -34,46 +38,46 @@ public class ProfessorFunction {
         String content = sc.nextLine();
         System.out.println("Choose difficulty [1] - [4]");
         int difficulty = sc.nextInt();
-        sc.nextLine(); 
+        sc.nextLine();
 
         String[] answer = new String[4];
         for (int i = 0; i < answer.length; i++) {
             System.out.println("Enter answer " + (i + 1) + ": ");
             answer[i] = sc.nextLine();
         }
-        
+
         System.out.println("Enter correct answer [1 - 4]: ");
         int correctAnswer = sc.nextInt();
-        sc.nextLine(); 
+        sc.nextLine();
 
         Question newQuestion = new Question(chapter, difficulty, content, answer, correctAnswer);
         questionRepository.addQuestion(newQuestion);
         System.out.println("Question has been added.");
     }
 
-    private static void removeQuestion(Scanner sc) {
-        QuestionRepository questionRepository = new QuestionRepository(Constant.dataPath.QuestionBanks_Dir);
+    private static void removeQuestion(Subject subject,Scanner sc) {
+        QuestionRepository questionRepository = new QuestionRepository(Constant.dataPath.QuestionBanks_Dir + subject.getId());
+        questionRepository.getQuesbank().setSubject(subject);
+        // System.out.println("Choose delete method");
+        // System.out.println("[1] Delete by content");
+        // System.out.println("[2] Delete by chapter");
+        // System.out.println("[3] Delete by difficulty");
 
-        System.out.println("Choose delete method");
-        System.out.println("[1] Delete by content");
-        System.out.println("[2] Delete by chapter");
-        System.out.println("[3] Delete by difficulty");
-
-        int choice = sc.nextInt();
-        sc.nextLine();
+        // int choice = sc.nextInt();
+        // sc.nextLine();
 
         ArrayList<Integer> indices = new ArrayList<>();
 
-        switch (choice) {
-            case 1:
+        switch (Menu.removeQuestion(sc)) {
+            case "1":
                 System.out.println("Enter content of question:");
                 indices = questionRepository.indexSearchQuestionByContent(sc.nextLine());
                 break;
-            case 2:
+            case "2":
                 System.out.println("Enter chapter of question:");
                 indices = questionRepository.indexSearchQuestionByChapter(sc.nextInt());
                 break;
-            case 3:
+            case "3":
                 System.out.println("Enter difficulty of question:");
                 indices = questionRepository.indexSearchQuestionByDiffi(sc.nextInt());
                 break;
@@ -88,13 +92,14 @@ public class ProfessorFunction {
         }
 
         System.out.println("Founded questions:");
-        indices.forEach(i -> System.out.println("[" + (i + 1) + "] " + questionRepository.getQuesbank().getQuesList().get(i)));
+        indices.forEach(
+                i -> System.out.println("[" + (i + 1) + "] " + questionRepository.getQuesbank().getQuesList().get(i)));
 
         System.out.println("Choose question to remove:");
         int choiceToRemove = sc.nextInt();
         sc.nextLine();
 
-        if (choiceToRemove >= 1 && choiceToRemove <= indices.size()) {
+        if ((int)choiceToRemove >= 1 && choiceToRemove <= indices.size()) {
             int indexToRemove = indices.get(choiceToRemove - 1);
             questionRepository.removeQuestion(indexToRemove);
             System.out.println("Question deleted.");
@@ -103,9 +108,9 @@ public class ProfessorFunction {
         }
     }
 
-    private static void modifyQuestion(Scanner sc) {
+    private static void modifyQuestion(Scanner sc, Subject subject) {
         QuestionRepository questionRepository = new QuestionRepository(Constant.dataPath.QuestionBanks_Dir);
-
+        questionRepository.getQuesbank().setSubject(subject);
         System.out.println("Choose modification method:");
         System.out.println("[1] Modify by content");
         System.out.println("[2] Modify by chapter");
@@ -140,7 +145,8 @@ public class ProfessorFunction {
         }
 
         System.out.println("Founded questions:");
-        indices.forEach(i -> System.out.println("[" + (i + 1) + "] " + questionRepository.getQuesbank().getQuesList().get(i)));
+        indices.forEach(
+                i -> System.out.println("[" + (i + 1) + "] " + questionRepository.getQuesbank().getQuesList().get(i)));
 
         System.out.println("Choose question to modify:");
         int choiceToModify = sc.nextInt();
@@ -148,13 +154,16 @@ public class ProfessorFunction {
 
         if (choiceToModify >= 1 && choiceToModify <= indices.size()) {
             int indexToModify = indices.get(choiceToModify - 1);
-            modifyQuestionAtIndex(sc, questionRepository, indexToModify);
+            modifyQuestionAtIndex(sc, subject, questionRepository, indexToModify);
         } else {
             System.out.println("Wrong input");
         }
     }
 
-    private static void modifyQuestionAtIndex(Scanner sc, QuestionRepository questionRepository, int indexToModify) {
+    private static void modifyQuestionAtIndex(Scanner sc,Subject subject, QuestionRepository questionRepository, int indexToModify) {
+
+        questionRepository.getQuesbank().setSubject(subject);
+
         Question questionToModify = questionRepository.getQuesbank().getQuesList().get(indexToModify);
 
         System.out.println("Enter new content:");
@@ -185,25 +194,24 @@ public class ProfessorFunction {
         System.out.println("Question modified.");
     }
 
-    public static void addExam(Scanner sc, Subject subject) {
-        
+    public static void createExam(Scanner sc, Subject subject) {
+
         System.out.println("Nhap ten class:");
-        String clazz = sc.nextLine();  
+        String clazz = sc.nextLine();
         Date date = new Date();
 
         System.out.println("nhap ngay thi:");
-        String newDate  = sc.nextLine();
+        String newDate = sc.nextLine();
         System.out.println("nhap thang:");
-        String newMonth  = sc.nextLine();
+        String newMonth = sc.nextLine();
         System.out.println("nhap nam:");
-        String newYear  = sc.nextLine();
+        String newYear = sc.nextLine();
 
         date.setDay(newDate);
         date.setMonth(newMonth);
         date.setYear(newYear);
 
-
-        ExamRepository examRepository = new ExamRepository(Constant.dataPath.Exams_Dir, subject, clazz, date);
+        ExamRepository examRepository = new ExamRepository(Constant.dataPath.Exams_Dir + subject.getId(), subject, clazz, date);
 
         System.out.println("nhap exam id:");
         String examId = sc.nextLine();
@@ -215,64 +223,52 @@ public class ProfessorFunction {
         int examTime = sc.nextInt();
         sc.nextLine();
 
-        System.out.println("nhap so luong cau hoi");
-        int quesCount = sc.nextInt();
-        sc.nextLine();
+        System.out.print("Enter the total number of questions (quesCount): ");
+        int totalQuestions = sc.nextInt();
 
-        ArrayList<QuestionCountDetail> questionCountDetails;
-
-        ArrayList<Integer> diffs = new ArrayList<Integer>();
-
-        for (QuestionCountDetail questionCD : questionCountDetails) {
-            System.out.println("chon chuong:");
+        // Example: Creating a list of QuestionCountDetail objects based on user input
+        ArrayList<QuestionCountDetail> questionCountDetails = new ArrayList<>();
+        
+        while (true) {
+            System.out.print("Enter the chapter number:");
             int chapter = sc.nextInt();
-            sc.nextLine();
-            System.out.println("nhap so luong cau hoi de");
-            int ezQues = sc.nextInt();
-            sc.nextLine();
-            diffs.add(ezQues);
+            
+            if (chapter == 0) {
+                break; // Stop entering chapters if the user enters 0
+            }
 
-            System.out.println("nhap so luong cau hoi tb");
-            int meQues = sc.nextInt();
-            sc.nextLine();
-            diffs.add(meQues);
+            ArrayList<Integer> difficultyCountDetail = new ArrayList<>();
+            
+            // Allow user input for each difficulty level
+            for (int i = 0; i < 3; i++) { // Assuming there are 3 difficulty levels (adjust as needed)
+                System.out.print("Enter the number of questions for difficulty level " + i + ": ");
+                int difficultyCount = sc.nextInt();
+                difficultyCountDetail.add(difficultyCount);
+                difficultyCountDetail.clear();
+            }
 
-            System.out.println("nhap so luong cau hoi kho");
-            int haQues = sc.nextInt();
-            sc.nextLine();
-            diffs.add(haQues);
+            QuestionCountDetail countDetail = new QuestionCountDetail(chapter, difficultyCountDetail);
 
-            questionCD.setChapter(chapter);
-            questionCD.setDifficultyCountDetail(diffs);
-            questionCountDetails.add(questionCD);
-            diffs.clear();
+            questionCountDetails.add(countDetail);
         }
 
-        QuestionSet questionSet = new QuestionSet(subject, quesCount, questionCountDetails);
+        QuestionSet questionSet = new QuestionSet(subject, totalQuestions, questionCountDetails);
 
-        QuestionRepository questionRepository = new QuestionRepository(Constant.dataPath.QuestionBanks_Dir);
-
-        questionRepository.getQuesbank().getQuesList();
+        questionSet.shuffleQuestionSet();
 
         Exam exam = new Exam(examId, examName, subject, examNote, date, examTime, questionSet);
         exam.setDate(date);
 
-        System.out.println("Enter exam file name: ");
-        String examFileName = sc.nextLine();
-
-        if (examRepository.addExam(exam, examFileName)) {
+        if (examRepository.createExams(exam, 1, 1)) {
             System.out.println("Exam added successfully.");
         } else {
             System.out.println("Failed to add exam.");
         }
     }
 
-
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        ProfessorFunction.addQuestion(sc);
-        ProfessorFunction.ShowQuesBank();
-        ProfessorFunction.removeQuestion(sc);
-        ProfessorFunction.modifyQuestion(sc);
+        Subject sj = new Subject("001");
+        ProfessorFunction.createExam(sc, sj);
     }
 }
