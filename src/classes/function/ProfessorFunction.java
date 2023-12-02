@@ -244,7 +244,6 @@ public class ProfessorFunction {
                 System.out.print("Enter the number of questions for difficulty level " + i + ": ");
                 int difficultyCount = sc.nextInt();
                 difficultyCountDetail.add(difficultyCount);
-                difficultyCountDetail.clear();
             }
 
             QuestionCountDetail countDetail = new QuestionCountDetail(chapter, difficultyCountDetail);
