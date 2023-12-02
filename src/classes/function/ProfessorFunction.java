@@ -14,13 +14,13 @@ import classes.subject.Subject;
 import classes.util.CheckInput;
 import classes.util.Constant;
 import classes.util.Date;
+import classes.util.FileHandling;
 import classes.util.Menu;
 
 public class ProfessorFunction {
 
     public static void ShowQuesBank(Subject subject) {
-        QuestionRepository questionRepository = new QuestionRepository(
-                Constant.dataPath.QuestionBanks_Dir + subject.getId());
+        QuestionRepository questionRepository = new QuestionRepository(Constant.dataPath.QuestionBanks_Dir + subject.getId());
         System.out.println("Question List:");
         questionRepository.getQuesbank().setSubject(subject);
         for (Question ques : questionRepository.getQuesbank().getQuesList()) {
@@ -29,14 +29,13 @@ public class ProfessorFunction {
     }
 
     public static void addQuestion(Subject subject, Scanner sc) {
-        QuestionRepository questionRepository = new QuestionRepository(
-                Constant.dataPath.QuestionBanks_Dir + subject.getId());
+        QuestionRepository questionRepository = new QuestionRepository(Constant.dataPath.QuestionBanks_Dir + subject.getId());
         System.out.println("Choose chapter :");
         int chapter = sc.nextInt();
         sc.nextLine();
         System.out.println("Enter content: ");
         String content = sc.nextLine();
-        System.out.println("Choose difficulty [1] - [4]");
+        System.out.println("Choose difficulty [0] - [2]");
         int difficulty = sc.nextInt();
         sc.nextLine();
 
@@ -109,7 +108,7 @@ public class ProfessorFunction {
     }
 
     private static void modifyQuestion(Scanner sc, Subject subject) {
-        QuestionRepository questionRepository = new QuestionRepository(Constant.dataPath.QuestionBanks_Dir);
+        QuestionRepository questionRepository = new QuestionRepository(Constant.dataPath.QuestionBanks_Dir  + subject.getId());
         questionRepository.getQuesbank().setSubject(subject);
         System.out.println("Choose modification method:");
         System.out.println("[1] Modify by content");
@@ -211,10 +210,8 @@ public class ProfessorFunction {
         date.setMonth(newMonth);
         date.setYear(newYear);
 
-        ExamRepository examRepository = new ExamRepository(Constant.dataPath.Exams_Dir + subject.getId(), subject, clazz, date);
+        ExamRepository examRepository = new ExamRepository(Constant.dataPath.Exams_Dir , subject, clazz, date);
 
-        System.out.println("nhap exam id:");
-        String examId = sc.nextLine();
         System.out.println("nhap exam name:");
         String examName = sc.nextLine();
         System.out.println("nhap exam note:");
@@ -226,39 +223,168 @@ public class ProfessorFunction {
         System.out.print("Enter the total number of questions (quesCount): ");
         int totalQuestions = sc.nextInt();
 
-        // Example: Creating a list of QuestionCountDetail objects based on user input
-        ArrayList<QuestionCountDetail> questionCountDetails = new ArrayList<>();
+        ArrayList<QuestionCountDetail> questionCountDetails = new ArrayList<QuestionCountDetail>();
         
-        while (true) {
+        QuestionCountDetail countDetail = null;
+        int dem = 0;
+        while (dem < totalQuestions) {
             System.out.print("Enter the chapter number:");
             int chapter = sc.nextInt();
-            
-            if (chapter == 0) {
-                break; // Stop entering chapters if the user enters 0
-            }
-
-            ArrayList<Integer> difficultyCountDetail = new ArrayList<>();
-            
-            // Allow user input for each difficulty level
-            for (int i = 0; i < 3; i++) { // Assuming there are 3 difficulty levels (adjust as needed)
-                System.out.print("Enter the number of questions for difficulty level " + i + ": ");
+            ArrayList<Integer> difficultyCountDetail = new ArrayList<Integer>();
+            for (int i = 0; i < 3; i++) { 
+                System.out.print("Enter the number of questions for difficulty level " + (i) + ": ");
                 int difficultyCount = sc.nextInt();
                 difficultyCountDetail.add(difficultyCount);
+                dem = dem+difficultyCount;
             }
 
-            QuestionCountDetail countDetail = new QuestionCountDetail(chapter, difficultyCountDetail);
+            countDetail = new QuestionCountDetail(chapter, difficultyCountDetail);
+            
+
+            System.out.println(countDetail.getDifficultyCountDetail());
 
             questionCountDetails.add(countDetail);
+
         }
 
         QuestionSet questionSet = new QuestionSet(subject, totalQuestions, questionCountDetails);
 
-        questionSet.shuffleQuestionSet();
+
+        Exam exam = new Exam(" ", examName, subject, examNote, date, examTime, questionSet);
+
+        System.out.println("Enter num of exams:");
+        int numOfExams = sc.nextInt();
+        sc.nextLine();
+        System.out.println("Enter num of exam ID");
+        int numOfExamId = sc.nextInt();
+        sc.nextLine();
+
+        if (examRepository.createExams(exam, numOfExams, numOfExamId)) {
+            System.out.println("Exam added successfully.");
+        } else {
+            System.out.println("Failed to add exam.");
+        }
+    }
+
+    public static void DisplayExam(Subject subject, Scanner sc)
+    {
+        System.out.println("Nhap ten class:");
+        String clazz = sc.nextLine();
+        Date date = new Date();
+        System.out.println("nhap ngay thi:");
+        String newDate = sc.nextLine();
+        System.out.println("nhap thang:");
+        String newMonth = sc.nextLine();
+        System.out.println("nhap nam:");
+        String newYear = sc.nextLine();
+
+        date.setDay(newDate);
+        date.setMonth(newMonth);
+        date.setYear(newYear);
+
+        ExamRepository examRepository = new ExamRepository(Constant.dataPath.Exams_Dir,subject,clazz,date);
+        examRepository.listAllExamsCreated();
+        System.out.println("nhap ten bai kiem tra");
+        String examname = sc.nextLine();
+        System.out.println(examRepository.previewExam(examname));
+        examRepository.removeExam(examname);
+    }
+
+    public static void deleteExam(Subject subject, Scanner sc)
+    {
+        System.out.println("Nhap ten class:");
+        String clazz = sc.nextLine();
+        Date date = new Date();
+        System.out.println("nhap ngay thi:");
+        String newDate = sc.nextLine();
+        System.out.println("nhap thang:");
+        String newMonth = sc.nextLine();
+        System.out.println("nhap nam:");
+        String newYear = sc.nextLine();
+
+        date.setDay(newDate);
+        date.setMonth(newMonth);
+        date.setYear(newYear);
+
+        ExamRepository examRepository = new ExamRepository(Constant.dataPath.Exams_Dir,subject,clazz,date);
+        System.out.println("Nhung bai kiem tra hien tai");
+        examRepository.listAllExamsCreated();
+        System.out.println("nhap ten bai kiem tra muon xoa");
+        String examname = sc.nextLine();
+        if(examRepository.removeExam(examname))
+        {
+            System.out.println("Bai kiem tra da duoc xoa!");
+        }
+        else{
+            System.out.println("Loi!");
+        }
+    }
+
+    public static void addExam(Subject subject, Scanner sc)
+    {
+        System.out.println("Nhap ten class:");
+        String clazz = sc.nextLine();
+        Date date = new Date();
+        System.out.println("nhap ngay thi:");
+        String newDate = sc.nextLine();
+        System.out.println("nhap thang:");
+        String newMonth = sc.nextLine();
+        System.out.println("nhap nam:");
+        String newYear = sc.nextLine();
+
+        date.setDay(newDate);
+        date.setMonth(newMonth);
+        date.setYear(newYear);
+
+        ExamRepository examRepository = new ExamRepository(Constant.dataPath.Exams_Dir,subject,clazz,date);
+        System.out.println("Nhap id exam");
+        String examId = sc.nextLine();
+        System.out.println("nhap exam name:");
+        String examName = sc.nextLine();
+        System.out.println("nhap exam note:");
+        String examNote = sc.nextLine();
+        System.out.println("nhap exam time:");
+        int examTime = sc.nextInt();
+        sc.nextLine();
+
+        System.out.print("Enter the total number of questions (quesCount): ");
+        int totalQuestions = sc.nextInt();
+        sc.nextLine();
+
+        ArrayList<QuestionCountDetail> questionCountDetails = new ArrayList<QuestionCountDetail>();
+        
+        QuestionCountDetail countDetail = null;
+        int dem = 0;
+        while (dem < totalQuestions) {
+            System.out.print("Enter the chapter number:");
+            int chapter = sc.nextInt();
+            ArrayList<Integer> difficultyCountDetail = new ArrayList<Integer>();
+            for (int i = 0; i < 3; i++) { 
+                System.out.print("Enter the number of questions for difficulty level " + (i) + ": ");
+                int difficultyCount = sc.nextInt();
+                difficultyCountDetail.add(difficultyCount);
+                dem = dem+difficultyCount;
+            }
+
+            countDetail = new QuestionCountDetail(chapter, difficultyCountDetail);
+            
+
+            System.out.println(countDetail.getDifficultyCountDetail());
+
+            questionCountDetails.add(countDetail);
+
+        }
+
+        QuestionSet questionSet = new QuestionSet(subject, totalQuestions, questionCountDetails);
+
 
         Exam exam = new Exam(examId, examName, subject, examNote, date, examTime, questionSet);
-        exam.setDate(date);
+        sc.nextLine();
 
-        if (examRepository.createExams(exam, 1, 1)) {
+        System.out.println("Nhap ten bai exam");
+        String examFileName = sc.nextLine();
+        
+        if (examRepository.addExam(exam, examFileName)) {
             System.out.println("Exam added successfully.");
         } else {
             System.out.println("Failed to add exam.");
@@ -268,6 +394,11 @@ public class ProfessorFunction {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         Subject sj = new Subject("001");
-        ProfessorFunction.createExam(sc, sj);
+        // ProfessorFunction.createExam(sc, sj);
+        // ProfessorFunction.addQuestion(sj, sc);
+        // ProfessorFunction.ShowQuesBank(sj);
+        ProfessorFunction.addExam(sj, sc);
+        ProfessorFunction.DisplayExam(sj, sc);
+        // ProfessorFunction.deleteExam(sj, sc);
     }
 }

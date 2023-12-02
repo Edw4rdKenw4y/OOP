@@ -17,7 +17,7 @@ public class ExamRepository extends FileHandling {
 	private Date date;
 
 	public ExamRepository(String baseDir, Subject subject, String clazz, Date date) {
-		super(baseDir + "/" + subject.getId() + "/" + clazz + "/" + date + "/");
+		super(baseDir + subject.getId() + "/" + clazz + "/" + date + "/");
 		this.baseDir = baseDir;
 		this.subject = subject;
 		this.clazz = clazz;

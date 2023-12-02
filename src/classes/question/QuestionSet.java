@@ -1,6 +1,7 @@
 package classes.question;
 
 import classes.subject.*;
+import classes.util.Constant;
 import classes.repository.*;
 
 import java.util.*;
@@ -17,13 +18,15 @@ public class QuestionSet {
 		this.subject = subject;
 		this.quesCount = quesCount;
 		this.questionCountDetail = questionCountDetail;
-		this.quesRepo = new QuestionRepository(subject.getId());
+		this.quesRepo = new QuestionRepository(Constant.dataPath.QuestionBanks_Dir + subject.getId());
+		this.quesSet = new ArrayList<Question>();
 		createQuestionSet();
 	}
 
 	private void createQuestionSet() {
 		for (QuestionCountDetail detail : questionCountDetail) {
 			ArrayList<Question> questionsOfChapter = quesRepo.searchQuestionByChapter(detail.getChapter());
+
 			for (int i = 0; i < detail.getDifficultyCountDetail().size(); i++) {
 				ArrayList<Question> questionsOfDifficulty = QuestionRepository.searchQuestionByDiffi(questionsOfChapter, i);
 				Random randNum = new Random();
@@ -31,15 +34,18 @@ public class QuestionSet {
 				int quesCountOfDiffi = detail.getDifficultyCountDetail().get(i);
 				while (set.size() < quesCountOfDiffi) {
 					int next = randNum.nextInt(questionsOfDifficulty.size());
-					if (set.add(next))
+					if (set.add(next)){
+						
 						quesSet.add(questionsOfDifficulty.get(next));
+					}
+					
 				}
 			}
 		}
 	}
 
 	public void shuffleQuestionSet() {
-		Collections.shuffle(this.quesSet);
+		Collections.shuffle(quesSet);
 	}
 
 	public Subject getSubject() {
